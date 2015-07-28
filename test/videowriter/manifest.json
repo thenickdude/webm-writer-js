@@ -1,0 +1,12 @@
+{
+  "name": "WebM writer test",
+  "description": "Test of webm-writer-js JavaScript library",
+  "version": "0.1",
+  "manifest_version": 2,
+  "app": {
+    "background": {
+      "scripts": ["background.js"]
+    }
+  },
+  "permissions": [{"fileSystem": ["write"]}]
+}
