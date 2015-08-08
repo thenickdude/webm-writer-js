@@ -18,6 +18,11 @@ to a server, or used for some other purpose. Note that Chrome has a [Blob size l
 
 ## Usage
 
+Download the script from the [Releases tab][] above. You should end up with a `webm-writer-x.x.x.js` file to add to your
+project.
+
+[Releases tab]: https://github.com/thenickdude/webm-writer-js/releases
+
 Include the script in your header:
 
 ```html
