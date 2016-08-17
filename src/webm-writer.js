@@ -74,14 +74,14 @@ var
     function extractKeyframeFromWebP(webP) {
         // Assume that Chrome will generate a Simple Lossy WebP which has this header:
         var
-            keyframeStartIndex = webP.indexOf('WEBPVP8 ');
+            keyframeStartIndex = webP.indexOf('VP8 ');
         
         if (keyframeStartIndex == -1) {
             throw "Failed to identify beginning of keyframe in WebP image";
         }
         
         // Skip the header and the 4 bytes that encode the length of the VP8 chunk
-        keyframeStartIndex += 'WEBPVP8 '.length + 4;
+        keyframeStartIndex += 'VP8 '.length + 4;
         
         return webP.substring(keyframeStartIndex);
     }
