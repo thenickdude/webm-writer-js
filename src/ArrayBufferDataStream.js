@@ -8,14 +8,12 @@
 
 "use strict";
 
-var ArrayBufferDataStream;
-
 (function(){
     /*
      * Create an ArrayBuffer of the given length and present it as a writable stream with methods
      * for writing data in different formats.
      */
-    ArrayBufferDataStream = function(length) {
+    var ArrayBufferDataStream = function(length) {
         this.data = new Uint8Array(length);
         this.pos = 0;
     };
@@ -202,4 +200,10 @@ var ArrayBufferDataStream;
             throw "ArrayBufferDataStream's pos lies beyond end of buffer";
         }
     };
+	
+	if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+		module.exports = ArrayBufferDataStream;
+	} else {
+		window.ArrayBufferDataStream = ArrayBufferDataStream;
+	}
 }());

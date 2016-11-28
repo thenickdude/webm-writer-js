@@ -1,0 +1,19 @@
+{
+  "name": "webm-writer",
+  "version": "0.2.0",
+  "description": "Render WebM videos from Canvas frames",
+  "main": "WebMWriter.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thenickdude/webm-writer-js.git"
+  },
+  "author": "Nicholas Sherlock",
+  "license": "WTFPL",
+  "bugs": {
+    "url": "https://github.com/thenickdude/webm-writer-js/issues"
+  },
+  "homepage": "https://github.com/thenickdude/webm-writer-js#readme"
+}

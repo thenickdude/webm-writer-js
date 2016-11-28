@@ -1,0 +1,19 @@
+{
+  "name": "webm-writer-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "",
+  "author": "Nicholas Sherlock",
+  "license": "WTFPL",
+  "devDependencies": {
+    "electron": "^1.4.1"
+  },
+  "dependencies": {
+    "jquery": "^3.1.1",
+    "webm-writer": "file:../../src"
+  }
+}

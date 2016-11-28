@@ -75,7 +75,7 @@ function testUnsignedIntBE() {
              {input: 2,             output:[0x02]},
              {input: 254,           output:[0xFE]},
              {input: 255,           output:[0xFF]}, 
-             {input: 256,           output:[0x01, 00]},
+             {input: 256,           output:[0x01, 0x00]},
              {input: 65534,         output:[0xFF, 0xFE]},
              {input: 65535,         output:[0xFF, 0xFF]},
              {input: 65536,         output:[0x01, 0x00, 0x00]},
