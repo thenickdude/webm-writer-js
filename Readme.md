@@ -54,6 +54,15 @@ Add as many Canvas frames as you like to build your video:
 videoWriter.addFrame(canvas);
 ```
 
+You can override the duration of a specific frame in milliseconds like so:
+
+```js
+videoWriter.addFrame(canvas, 100);
+```
+
+Note that if the canvas' dimensions change between frames, the resulting WebM video may not be compatible with all players,
+because the frame dimensions will differ from the overall track's dimensions. This could be improved in the future.
+
 When you're done, you must call `complete()` to finish writing the video:
 
 ```js

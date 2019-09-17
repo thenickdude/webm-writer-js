@@ -64,7 +64,9 @@
          */
         function renderAsWebP(canvas, quality) {
             var
-                frame = canvas.toDataURL('image/webp', quality);
+                frame = typeof canvas === 'string' && /^data:image\/webp/.test(canvas)
+                    ? canvas
+                    : canvas.toDataURL('image/webp', quality);
             
             return decodeBase64WebPDataURL(frame);
         }
@@ -602,14 +604,13 @@
             }
             
             /**
-             * Add a frame to the video. Currently the frame must be a Canvas element.
+             * Add a frame to the video.
+             *
+             * @param {HTMLCanvasElement} canvas
+             * @param {Number} [overrideFrameDuration] - Set a duration for this frame (in milliseconds) that differs from the default
              */
-            this.addFrame = function(canvas) {
-                if (writtenHeader) {
-                    if (canvas.width != videoWidth || canvas.height != videoHeight) {
-                        throw "Frame size differs from previous frames";
-                    }
-                } else {
+            this.addFrame = function(canvas, overrideFrameDuration) {
+                if (!writtenHeader) {
                     videoWidth = canvas.width;
                     videoHeight = canvas.height;
     
@@ -626,7 +627,7 @@
                 
                 addFrameToCluster({
                     frame: extractKeyframeFromWebP(webP),
-                    duration: options.frameDuration
+                    duration: overrideFrameDuration === undefined ? options.frameDuration : overrideFrameDuration
                 });
             };
             
