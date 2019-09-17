@@ -210,7 +210,7 @@
 							result.push(buffer[i].data);
 						}
 						
-						return new Blob(result, {mimeType: mimeType});
+						return new Blob(result, {type: mimeType});
 					});
 				}
 				
