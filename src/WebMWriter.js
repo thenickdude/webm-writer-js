@@ -64,7 +64,9 @@
          */
         function renderAsWebP(canvas, quality) {
             var
-                frame = canvas.toDataURL('image/webp', quality);
+                frame = typeof canvas === 'string' && /^data:image\/webp/.test(canvas) 
+	                ? canvas 
+	                : canvas.toDataURL('image/webp', quality);
             
             return decodeBase64WebPDataURL(frame);
         }
@@ -206,6 +208,9 @@
                     // You must supply one of:
                     frameDuration: null, // Duration of frames in milliseconds
                     frameRate: null,     // Number of frames per second
+			
+	            // Set to true for variable resolution and variable frame duration encoding
+	            variableResolution: null
                 },
                 
                 seekPoints = {
@@ -600,34 +605,44 @@
         
                 blobBuffer.seek(oldPos);
             }
-            
             /**
              * Add a frame to the video. Currently the frame must be a Canvas element.
+             * If options.variableResolution is true: 
+	     *     frameDuration - duration of individual frame
+	     *     width - width of WebP image
+	     *     height - height of WebP image
              */
-            this.addFrame = function(canvas) {
-                if (writtenHeader) {
-                    if (canvas.width != videoWidth || canvas.height != videoHeight) {
-                        throw "Frame size differs from previous frames";
-                    }
-                } else {
-                    videoWidth = canvas.width;
-                    videoHeight = canvas.height;
-    
-                    writeHeader();
-                    writtenHeader = true;
-                }
-    
-                var
-                    webP = renderAsWebP(canvas, options.quality);
-                
-                if (!webP) {
-                    throw "Couldn't decode WebP frame, does the browser support WebP?";
-                }
-                
-                addFrameToCluster({
-                    frame: extractKeyframeFromWebP(webP),
-                    duration: options.frameDuration
-                });
+             this.addFrame = function(canvas, frameDuration, width, height) {
+                 if (options.variableResolution) {
+                   videoWidth = width;
+                   videoHeight = height;
+                   options.frameDuration = frameDuration;
+                 } else {
+                   if (writtenHeader) {
+                     if (canvas.width != videoWidth || canvas.height != videoHeight) {
+                       throw "Frame size differs from previous frames";
+                     }
+                   } else {
+                       videoWidth = canvas.width;
+                       videoHeight = canvas.height;
+                       frameDuration = options.frameDuration
+                   }
+                 }
+        
+                 writeHeader();
+                 writtenHeader = true;
+
+                 var
+                   webP = renderAsWebP(canvas, options.quality);
+
+                 if (!webP) {
+                   throw "Couldn't decode WebP frame, does the browser support WebP?";
+                 }
+
+                 addFrameToCluster({
+                   frame: extractKeyframeFromWebP(webP),
+                   duration: options.frameDuration
+                 });
             };
             
             /**
