@@ -625,7 +625,6 @@
                    } else {
                        videoWidth = canvas.width;
                        videoHeight = canvas.height;
-                       frameDuration = options.frameDuration
                    }
                  }
         
