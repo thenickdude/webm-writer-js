@@ -617,14 +617,18 @@
                    videoWidth = width;
                    videoHeight = height;
                    options.frameDuration = frameDuration;
+                   if (!writtenHeader) {
+                     writeHeader();
+                     writtenHeader = true;
+                   }
                  } else {
                    if (writtenHeader) {
                      if (canvas.width != videoWidth || canvas.height != videoHeight) {
                        throw "Frame size differs from previous frames";
                      }
                    } else {
-                       videoWidth = canvas.width;
-                       videoHeight = canvas.height;
+                     videoWidth = canvas.width;
+                     videoHeight = canvas.height;
                    }
                  }
         
