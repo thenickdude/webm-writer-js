@@ -629,11 +629,10 @@
                    } else {
                      videoWidth = canvas.width;
                      videoHeight = canvas.height;
+	             writeHeader();
+                     writtenHeader = true;
                    }
                  }
-        
-                 writeHeader();
-                 writtenHeader = true;
 
                  var
                    webP = renderAsWebP(canvas, options.quality);
