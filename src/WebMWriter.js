@@ -194,7 +194,7 @@
                 DEFAULT_TRACK_NUMBER = 1,
             
                 writtenHeader = false,
-                videoWidth, videoHeight,
+                videoWidth = 0, videoHeight = 0,
                 
                 clusterFrameBuffer = [],
                 clusterStartTime = 0,
@@ -403,7 +403,9 @@
                 // Now we know where these top-level elements lie in the file:
                 seekPoints.SegmentInfo.positionEBML.data = fileOffsetToSegmentRelative(segmentInfo.offset);
                 seekPoints.Tracks.positionEBML.data = fileOffsetToSegmentRelative(tracks.offset);
-            };
+                
+	            writtenHeader = true;
+            }
             
             /**
              * Create a SimpleBlock keyframe header using these fields:
@@ -615,7 +617,6 @@
                     videoHeight = canvas.height || 0;
     
                     writeHeader();
-                    writtenHeader = true;
                 }
     
                 var
@@ -638,6 +639,10 @@
              * a Blob with the contents of the entire video.
              */
             this.complete = function() {
+            	if (!writtenHeader) {
+		            writeHeader();
+	            }
+	            
                 flushClusterFrameBuffer();
                 
                 writeCues();
