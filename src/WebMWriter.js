@@ -611,8 +611,8 @@
              */
             this.addFrame = function(canvas, overrideFrameDuration) {
                 if (!writtenHeader) {
-                    videoWidth = canvas.width;
-                    videoHeight = canvas.height;
+                    videoWidth = canvas.width || 0;
+                    videoHeight = canvas.height || 0;
     
                     writeHeader();
                     writtenHeader = true;
