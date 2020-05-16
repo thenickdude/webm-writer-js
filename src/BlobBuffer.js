@@ -70,7 +70,7 @@
 					result = data.byteLength || data.length || data.size;
 				
 				if (!Number.isInteger(result)) {
-					throw "Failed to determine size of element";
+					throw new Error("Failed to determine size of element");
 				}
 				
 				return result;
@@ -84,15 +84,15 @@
 			 */
 			this.seek = function (offset) {
 				if (offset < 0) {
-					throw "Offset may not be negative";
+					throw new Error("Offset may not be negative");
 				}
 				
 				if (isNaN(offset)) {
-					throw "Offset may not be NaN";
+					throw new Error("Offset may not be NaN");
 				}
 				
 				if (offset > this.length) {
-					throw "Seeking beyond the end of file is not allowed";
+					throw new Error("Seeking beyond the end of file is not allowed");
 				}
 				
 				this.pos = offset;

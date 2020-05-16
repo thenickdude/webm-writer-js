@@ -77,7 +77,7 @@
                 keyframeStartIndex = webP.indexOf('VP8 ');
             
             if (keyframeStartIndex == -1) {
-                throw "Failed to identify beginning of keyframe in WebP image";
+                throw new Error("Failed to identify beginning of keyframe in WebP image");
             }
             
             // Skip the header and the 4 bytes that encode the length of the VP8 chunk
@@ -181,10 +181,10 @@
                     ebml.dataOffset = buffer.pos + bufferFileOffset;
                     buffer.writeBytes(ebml.data);
                 } else {
-                    throw "Bad EBML datatype " + typeof ebml.data;
+                    throw new Error("Bad EBML datatype " + typeof ebml.data);
                 }
             } else {
-                throw "Bad EBML datatype " + typeof ebml.data;
+                throw new Error("Bad EBML datatype " + typeof ebml.data);
             }
         }
         
@@ -420,7 +420,7 @@
                     bufferStream = new ArrayBufferDataStream(1 + 2 + 1);
                 
                 if (!(keyframe.trackNumber > 0 && keyframe.trackNumber < 127)) {
-                    throw "TrackNumber must be > 0 and < 127";
+                    throw new Error("TrackNumber must be > 0 and < 127");
                 }
     
                 bufferStream.writeEBMLVarInt(keyframe.trackNumber); // Always 1 byte since we limit the range of trackNumber
@@ -547,7 +547,7 @@
                     if (options.frameRate) {
                         options.frameDuration = 1000 / options.frameRate;
                     } else {
-                        throw "Missing required frameDuration or frameRate setting";
+                        throw new Error("Missing required frameDuration or frameRate setting");
                     }
                 }
             }
@@ -623,7 +623,7 @@
                     webP = renderAsWebP(canvas, options.quality);
                 
                 if (!webP) {
-                    throw "Couldn't decode WebP frame, does the browser support WebP?";
+                    throw new Error("Couldn't decode WebP frame, does the browser support WebP?");
                 }
                 
                 addFrameToCluster({

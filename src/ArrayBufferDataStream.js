@@ -108,7 +108,7 @@
                 this.writeU8(i);
             break;
             default:
-                throw new RuntimeException("Bad EBML VINT size " + width);
+                throw new Error("Bad EBML VINT size " + width);
         }
     };
     
@@ -130,7 +130,7 @@
         } else if (val < 34359738367) { // 2 ^ 35 - 1 (can address 32GB)
             return 5;
         } else {
-            throw new RuntimeException("EBML VINT size not supported " + val);
+            throw new Error("EBML VINT size not supported " + val);
         }
     };
     
@@ -166,7 +166,7 @@
                 this.writeU8(u);
             break;
             default:
-                throw new RuntimeException("Bad UINT size " + width);
+                throw new Error("Bad UINT size " + width);
         }
     };
     
@@ -197,7 +197,7 @@
         } else if (this.pos == this.data.byteLength) {
             return this.data;
         } else {
-            throw "ArrayBufferDataStream's pos lies beyond end of buffer";
+            throw new Error("ArrayBufferDataStream's pos lies beyond end of buffer");
         }
     };
 	
