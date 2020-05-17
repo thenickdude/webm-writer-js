@@ -1,6 +1,6 @@
 {
   "name": "webm-writer",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Render WebM videos from Canvas frames",
   "main": "WebMWriter.js",
   "scripts": {
