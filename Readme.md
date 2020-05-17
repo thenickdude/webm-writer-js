@@ -40,7 +40,7 @@ First construct the writer, passing in any options you want to customize:
 
 ```js
 var videoWriter = new WebMWriter({
-    quality: 0.95,    // WebM image quality from 0.0 (worst) to 1.0 (best)
+    quality: 0.95,    // WebM image quality from 0.0 (worst) to 0.99999 (best), 1.00 (VP8L lossless) is not supported
     fileWriter: null, // FileWriter in order to stream to a file instead of buffering to memory (optional)
     fd: null,         // Node.js file handle to write to instead of buffering to memory (optional)
 

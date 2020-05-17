@@ -201,7 +201,7 @@
                 clusterDuration = 0,
                 
                 optionDefaults = {
-                    quality: 0.95,       // WebM image quality from 0.0 (worst) to 1.0 (best)
+                    quality: 0.95,       // WebM image quality from 0.0 (worst) to 0.99999 (best), 1.00 (VP8L lossless) is not supported
                     fileWriter: null,    // Chrome FileWriter in order to stream to a file instead of buffering to memory (optional)
                     fd: null,            // Node.JS file descriptor to write to instead of buffering (optional)
                     
@@ -550,6 +550,9 @@
                         throw new Error("Missing required frameDuration or frameRate setting");
                     }
                 }
+                
+                // Avoid 1.0 (lossless) because it creates VP8L lossless frames that we don't support (webm doesn't look like it supports these)
+                options.quality = Math.max(Math.min(options.quality, 0.99999), 0);
             }
             
             function addFrameToCluster(frame) {
