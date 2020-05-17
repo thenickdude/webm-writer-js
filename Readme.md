@@ -3,18 +3,20 @@
 This is a JavaScript-based WebM video encoder based on the ideas from [Whammy][]. It allows you to turn a series of 
 Canvas frames into a WebM video.
 
-This implementation allows you to create very large video files (exceeding the size of available memory), because it
-can stream chunks immediately to a file on disk using [Chrome's FileWriter][]  while the video is being constructed, 
-instead of needing to buffer the entire video in memory before saving can begin. Video sizes in excess of 4GB can be 
-written. The implementation currently tops out at 32GB, but this could be extended.
+This implementation allows you to create very large video files (exceeding the size of available memory), because when
+running in a privileged context like a Chrome extension or Electron app, it can stream chunks immediately to a file on disk 
+using [Chrome's FileWriter][] while the video is being constructed, instead of needing to buffer the entire video in
+memory before saving can begin. Video sizes in excess of 4GB can be written. The implementation currently tops out at 
+32GB, but this could be extended.
 
 When a FileWriter is not available, it can instead buffer the video in memory as a series of Blobs which are eventually 
 returned to the calling code as one composite Blob. This Blob can be displayed in a &lt;video&gt; element, transmitted 
-to a server, or used for some other purpose. Note that Chrome has a [Blob size limit][] of 500MB.
+to a server, or used for some other purpose. Note that some browsers size limits on Blobs, particularly mobile 
+browsers, check out the [Blob size limits][].
 
 [Chrome's FileWriter]: https://developer.chrome.com/apps/fileSystem
 [Whammy]: https://github.com/antimatter15/whammy
-[Blob size limit]: https://github.com/eligrey/FileSaver.js/
+[Blob size limits]: https://github.com/eligrey/FileSaver.js/
 
 ## Compatibility
 
