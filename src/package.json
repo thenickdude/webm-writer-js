@@ -4,7 +4,7 @@
   "description": "Render WebM videos from Canvas frames",
   "main": "WebMWriter.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "electron-mocha --renderer"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/thenickdude/webm-writer-js/issues"
   },
-  "homepage": "https://github.com/thenickdude/webm-writer-js#readme"
+  "homepage": "https://github.com/thenickdude/webm-writer-js#readme",
+  "devDependencies": {
+    "electron": "^9.0.5",
+    "electron-mocha": "^8.2.2",
+    "mocha": "^8.0.1"
+  }
 }
