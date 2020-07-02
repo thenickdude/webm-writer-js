@@ -1,9 +1,17 @@
-TARGET_FILE = webm-writer-$(VERSION).js
+VERSION=0.3.0
+VERSIONED_DIST_FILE = dist/webm-writer-$(VERSION).js
 
-TEST_COPY = test/videowriter/webm-writer.js
+all : dist/ $(VERSIONED_DIST_FILE) dist/webm-writer.js
 
-$(TEST_COPY) : $(TARGET_FILE)
-	cp $(TARGET_FILE) $(TEST_COPY)
+dist/ :
+	mkdir dist
 
-$(TARGET_FILE) : src/ArrayBufferDataStream.js src/BlobBuffer.js src/WebMWriter.js
-	cat $^ > $(TARGET_FILE)
+$(VERSIONED_DIST_FILE) : dist/webm-writer.js
+	cp $< $@
+
+# Create the bundled version of the code by just concatenating the required source...
+dist/webm-writer.js : src/ArrayBufferDataStream.js src/BlobBuffer.js src/WebMWriter.js
+	cat $^ > $@
+
+clean :
+	rm -f dist/*
