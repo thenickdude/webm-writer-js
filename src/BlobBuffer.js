@@ -3,12 +3,12 @@
 /**
  * Allows a series of Blob-convertible objects (ArrayBuffer, Blob, String, etc) to be added to a buffer. Seeking and
  * overwriting of blobs is allowed.
- * 
- * You can supply a FileWriter, in which case the BlobBuffer is just used as temporary storage before it writes it 
+ *
+ * You can supply a FileWriter, in which case the BlobBuffer is just used as temporary storage before it writes it
  * through to the disk.
- * 
+ *
  * By Nicholas Sherlock
- * 
+ *
  * Released under the WTFPLv2 https://en.wikipedia.org/wiki/WTFPL
  */
 (function() {
@@ -20,7 +20,7 @@
 				fileWriter = null,
 				fd = null;
 			
-			if (typeof FileWriter !== "undefined" && destination instanceof FileWriter) {
+			if (destination && destination.constructor.name === "FileWriter") {
 				fileWriter = destination;
 			} else if (fs && destination) {
 				fd = destination;

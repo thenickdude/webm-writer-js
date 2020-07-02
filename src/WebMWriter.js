@@ -918,10 +918,10 @@
             validateOptions();
         };
     };
-
+    
     if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
 	    module.exports = WebMWriter(require("./ArrayBufferDataStream"), require("./BlobBuffer"));
     } else {
-	    window.WebMWriter = WebMWriter(ArrayBufferDataStream, BlobBuffer);
+	    window.WebMWriter = WebMWriter(window.ArrayBufferDataStream, window.BlobBuffer);
     }
 })();

@@ -10,7 +10,7 @@
   "author": "Nicholas Sherlock",
   "license": "WTFPL",
   "devDependencies": {
-    "electron": "^1.4.1"
+    "electron": "^9.0.5"
   },
   "dependencies": {
     "jquery": "^3.1.1",
