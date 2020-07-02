@@ -21,7 +21,8 @@ browsers, check out the [Blob size limits][].
 ## Compatibility
 
 Because this code relies on browser support for encoding a Canvas as a WebP image (using `toDataURL()`), it is presently
-only supported in Google Chrome. It will throw an exception on other browsers.
+only supported in Google Chrome, or a similar environment like Electron. It will throw an exception on other browsers or
+on vanilla Node.
 
 ## Usage (Chrome)
 
@@ -33,7 +34,7 @@ project.
 Include the script in your header:
 
 ```html
-<script type="text/javascript" src="webm-writer-0.1.0.js"></script>
+<script type="text/javascript" src="webm-writer-0.3.0.js"></script>
 ```
 
 First construct the writer, passing in any options you want to customize:
@@ -47,6 +48,10 @@ var videoWriter = new WebMWriter({
     // You must supply one of:
     frameDuration: null, // Duration of frames in milliseconds
     frameRate: null,     // Number of frames per second
+
+    transparent: false,      // True if an alpha channel should be included in the video
+    alphaQuality: undefined, // Allows you to set the quality level of the alpha channel separately.
+                             // If not specified this defaults to the same value as `quality`.
 });
 ```
 
@@ -86,6 +91,15 @@ videoWriter.complete().then(function(webMBlob) {
 
 The video encoder can use Node.js file APIs to write the video to disk when running under Electron. There is an example
 in `test/electron`. Run `npm install` in that directory to fetch required libraries, then `npm start` to launch Electron.
+
+## Transparent WebM support
+
+Transparent WebM files are supported, check out the example in test/transparent. However, because I'm re-using Chrome's 
+WebP encoder to create the alpha channel, and the alpha channel is taken from the Y channel of a YUV-encoded WebP frame, 
+and Y values are clamped by Chrome to be in the range 22-240 instead of the full 0-255 range, the encoded video can 
+neither be fully opaque or fully transparent :(.
+
+Sorry, I wasn't able to find a workaround to get that to work.  
 
 ## License
 
