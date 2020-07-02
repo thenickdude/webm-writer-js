@@ -12,9 +12,9 @@
  * Released under the WTFPLv2 https://en.wikipedia.org/wiki/WTFPL
  */
 (function() {
-	var BlobBuffer = function(fs) {
+	let BlobBuffer = function(fs) {
 		return function(destination) {
-			var
+			let
 				buffer = [],
 				writePromise = Promise.resolve(),
 				fileWriter = null,
@@ -35,7 +35,7 @@
 			// Returns a promise that converts the blob to an ArrayBuffer
 			function readBlobAsBuffer(blob) {
 				return new Promise(function (resolve, reject) {
-					var
+					let
 						reader = new FileReader();
 					
 					reader.addEventListener("loadend", function () {
@@ -66,7 +66,7 @@
 			}
 			
 			function measureData(data) {
-				var
+				let
 					result = data.byteLength || data.length || data.size;
 				
 				if (!Number.isInteger(result)) {
@@ -105,7 +105,7 @@
 			 * be fully contained by the extent of a previous write).
 			 */
 			this.write = function (data) {
-				var
+				let
 					newEntry = {
 						offset: this.pos,
 						data: data,
@@ -121,7 +121,7 @@
 					if (fd) {
 						return new Promise(function(resolve, reject) {
 							convertToUint8Array(newEntry.data).then(function(dataArray) {
-								var
+								let
 									totalWritten = 0,
 									buffer = Buffer.from(dataArray.buffer),
 									
@@ -150,8 +150,8 @@
 						// We might be modifying a write that was already buffered in memory.
 						
 						// Slow linear search to find a block we might be overwriting
-						for (var i = 0; i < buffer.length; i++) {
-							var
+						for (let i = 0; i < buffer.length; i++) {
+							let
 								entry = buffer[i];
 							
 							// If our new entry overlaps the old one in any way...
@@ -203,10 +203,10 @@
 				} else {
 					// After writes complete we need to merge the buffer to give to the caller
 					writePromise = writePromise.then(function () {
-						var
+						let
 							result = [];
 						
-						for (var i = 0; i < buffer.length; i++) {
+						for (let i = 0; i < buffer.length; i++) {
 							result.push(buffer[i].data);
 						}
 						
