@@ -1,5 +1,5 @@
 const
-    BlobBuffer = require("../BlobBuffer");
+    BlobBuffer = require("../BlobBuffer")(require('fs'));
 
 function assert(test, message) {
     if (!test) {
