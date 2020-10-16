@@ -128,6 +128,10 @@
         throw new Error("Failed to find VP8 keyframe in WebP image, is this image mistakenly encoded in the Lossless WebP format?");
     }
     
+    const 
+        EBML_SIZE_UNKNOWN = -1,
+        EBML_SIZE_UNKNOWN_5_BYTES = -2;
+    
     // Just a little utility so we can tag values as floats for the EBML encoder's benefit
     function EBMLFloat32(value) {
         this.value = value;
@@ -172,9 +176,14 @@
                 let
                     sizePos, dataBegin, dataEnd;
                 
-                if (ebml.size === -1) {
+                if (ebml.size === EBML_SIZE_UNKNOWN) {
                     // Write the reserved all-one-bits marker to note that the size of this element is unknown/unbounded
                     buffer.writeByte(0xFF);
+                } else if (ebml.size === EBML_SIZE_UNKNOWN_5_BYTES) {
+                    sizePos = buffer.pos;
+                    
+                    // VINT_DATA is all-ones, so this is the reserved "unknown length" marker:
+                    buffer.writeBytes([0x0F, 0xFF, 0xFF, 0xFF, 0xFF]);
                 } else {
                     sizePos = buffer.pos;
                     
@@ -190,7 +199,7 @@
                 ebml.dataOffset = dataBegin + bufferFileOffset;
                 writeEBML(buffer, bufferFileOffset, ebml.data);
                 
-                if (ebml.size !== -1) {
+                if (ebml.size !== EBML_SIZE_UNKNOWN && ebml.size !== EBML_SIZE_UNKNOWN_5_BYTES) {
                     dataEnd = buffer.pos;
                     
                     ebml.size = dataEnd - dataBegin;
@@ -531,7 +540,7 @@
                 
                 ebmlSegment = {
                     "id": 0x18538067, // Segment
-                    "size": -1, // Unbounded size
+                    "size": EBML_SIZE_UNKNOWN_5_BYTES, // We'll seek back and fill this in at completion
                     "data": [
                         seekHead,
                         segmentInfo,
@@ -833,6 +842,25 @@
         
                 blobBuffer.seek(oldPos);
             }
+    
+            /**
+             * Rewrite the size field of the Segment.
+             */
+            function rewriteSegmentLength() {
+                let
+                    buffer = new ArrayBufferDataStream(10),
+                    oldPos = blobBuffer.pos;
+    
+                // We just need to rewrite the ID and Size fields of the root Segment:
+                buffer.writeUnsignedIntBE(ebmlSegment.id);
+                buffer.writeEBMLVarIntWidth(blobBuffer.pos - ebmlSegment.dataOffset, 5);
+                
+                // And write that on top of the original:
+                blobBuffer.seek(ebmlSegment.offset);
+                blobBuffer.write(buffer.getAsDataArray());
+        
+                blobBuffer.seek(oldPos);
+            }
             
             /**
              * Add a frame to the video.
@@ -902,10 +930,16 @@
 	            }
 	            
                 flushClusterFrameBuffer();
-                
                 writeCues();
+                
+                /* 
+                 * Now the file is at its final length and the position of all elements is known, seek back to the
+                 * header and update pointers:
+                 */
+                
                 rewriteSeekHead();
                 rewriteDuration();
+                rewriteSegmentLength();
                 
                 return blobBuffer.complete('video/webm');
             };
