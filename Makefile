@@ -1,4 +1,4 @@
-VERSION=0.3.0
+VERSION=0.3.1
 VERSIONED_DIST_FILE = dist/webm-writer-$(VERSION).js
 
 all : dist/ $(VERSIONED_DIST_FILE) dist/webm-writer.js test/videowriter/webm-writer.js
