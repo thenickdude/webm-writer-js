@@ -2,7 +2,8 @@
   "name": "webm-writer",
   "version": "0.3.1",
   "description": "Render WebM videos from Canvas frames",
-  "main": "WebMWriter.js",
+  "main": "main.js",
+  "browser": "browser.js",
   "scripts": {
     "test": "electron-mocha --renderer"
   },

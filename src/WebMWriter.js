@@ -954,7 +954,7 @@
     };
     
     if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-	    module.exports = WebMWriter(require("./ArrayBufferDataStream"), require("./BlobBuffer"));
+	    module.exports = WebMWriter;
     } else {
 	    window.WebMWriter = WebMWriter(window.ArrayBufferDataStream, window.BlobBuffer);
     }

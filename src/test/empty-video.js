@@ -1,5 +1,5 @@
 const
-	WebMWriter = require("../WebMWriter");
+	WebMWriter = require("../main");
 
 describe("WebMWriter", function() {
 	it("Doesn't crash when rendering a video with zero frames", function() {
