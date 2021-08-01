@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="webm-writer.js"></script>
+  </head>
+
+  <body>
+    <p>Stream</p>
+    <video controls autoplay></video>
+    <canvas></canvas>
+    <script>
+      let width;
+      let height;
+      let ctx;
+      let controller;
+      let done;
+      const canvas = document.querySelector('canvas');
+
+      const video = document.querySelector('video');
+      let videoWriter, fileHandle, writable, fileWriter;
+      const frames = [];
+      video.onloadedmetadata = (e) => {
+        console.log(e.target.duration);
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        console.log(canvas.width, canvas.height);
+        if (!ctx) {
+          ctx = canvas.getContext('2d');
+          ctx.globalComposite = 'copy';
+        }
+      };
+      video.onplay = async (e) => {
+        let frameRate = 0;
+        frames.push([
+          {
+            duration: video.currentTime,
+            frameRate: 0,
+            width: video.videoWidth,
+            height: video.videoHeight,
+          },
+        ]);
+        const processData = async ({ done }) =>
+          done
+            ? await reader.closed
+            : (await new Promise((resolve) =>
+                setTimeout(
+                  resolve,
+                  1000 /
+                    30 /* adjust number of frames per second written to file */
+                )
+              ),
+              ctx.drawImage(video, 0, 0),
+              frames[frames.length - 1].push(canvas.toDataURL('image/webp')),
+              processData(await reader.read()));
+
+        const rs = new ReadableStream({
+          start(c) {
+            return (controller = c);
+          },
+          pull(_) {
+            controller.enqueue(null);
+          },
+        });
+        const reader = rs.getReader();
+        done = processData(await reader.read());
+      };
+      document.querySelector('p').onclick = async () => {
+        fileHandle = await showSaveFilePicker({
+          suggestedName: 'webm-writer-filesystem-access.webm',
+          startIn: 'videos',
+          id: 'webm-writer',
+          types: [
+            {
+              description: 'WebM files',
+              accept: {
+                'video/webm': ['.webm'],
+              },
+            },
+          ],
+          excludeAcceptAllOption: true,
+        });
+        writable = await fileHandle.createWritable();
+        fileWriter = await writable.getWriter();
+        videoWriter = new WebMWriter({
+          quality: 0.95, // WebM image quality from 0.0 (worst) to 1.0 (best)
+          fileWriter, // FileWriter in order to stream to a file instead of buffering to memory (optional)
+          fd: null, // Node.js file handle to write to instead of buffering to memory (optional)
+          // You must supply one of:
+          frameDuration: null, // Duration of frames in milliseconds
+          frameRate: 30, // Number of frames per second
+          // add support for variable resolution, variable frame duration, data URL representation of WebP input
+          variableResolution: true, // frameRate is not used for variable resolution
+        });
+        const urls = Promise.all(
+          [
+            {
+              from: 0,
+              to: 4,
+              src:
+                'https://upload.wikimedia.org/wikipedia/commons/a/a4/Xacti-AC8EX-Sample_video-001.ogv',
+            },
+            {
+              from: 10,
+              to: 20,
+              src:
+                'https://mirrors.creativecommons.org/movingimages/webm/ScienceCommonsJesseDylan_240p.webm#t=10,20',
+            },
+          ].map(async ({ from, to, src }) => {
+            try {
+              const request = await fetch(src);
+              const blob = await request.blob();
+              const blobURL = URL.createObjectURL(blob);
+              const url = new URL(src);
+              console.log(url.hash);
+              return blobURL + (url.hash || `#t=${from},${to}`);
+            } catch (e) {
+              throw e;
+            }
+          })
+        );
+        let media = await urls;
+        for (const blobURL of media) {
+          await new Promise(async (resolve) => {
+            video.addEventListener(
+              'pause',
+              (e) => {
+                controller.close();
+                const currentFrames = frames[frames.length - 1];
+                const [frame] = currentFrames;
+                frame.duration = video.currentTime - frame.duration;
+                frame.frameRate =
+                  (frame.duration * 60) / currentFrames.length - 1;
+                done.then(resolve);
+              },
+              {
+                once: true,
+              }
+            );
+            video.src = blobURL;
+          });
+        }
+        console.log(frames);
+        for (const frame of frames) {
+          const [{ duration, frameRate, width, height }] = frame;
+          console.log(frameRate);
+          const framesLength = frame.length;
+          const frameDuration = Math.ceil((duration * 1000) / framesLength);
+          for (let i = 1; i < framesLength; i++) {
+            videoWriter.addFrame(frame[i], frameDuration, width, height);
+          }
+        }
+        await videoWriter.complete();
+        await fileWriter.close();
+        await fileWriter.closed;
+        video.remove();
+        canvas.remove();
+        frames.length = 0;
+        const videoStream = document.createElement('video');
+        videoStream.onloadedmetadata = (_) => console.log(videoStream.duration);
+        videoStream.onended = (_) =>
+          console.log(videoStream.duration, videoStream.currentTime);
+        videoStream.controls = videoStream.autoplay = true;
+        document.body.appendChild(videoStream);
+        const file = await fileHandle.getFile();
+        console.log(fileHandle, fileWriter, file);
+        videoStream.src = URL.createObjectURL(file);
+      };
+    </script>
+  </body>
+</html>
