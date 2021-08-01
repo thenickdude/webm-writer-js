@@ -4,8 +4,9 @@
  * Allows a series of Blob-convertible objects (ArrayBuffer, Blob, String, etc) to be added to a buffer. Seeking and
  * overwriting of blobs is allowed.
  *
- * You can supply a FileWriter, in which case the BlobBuffer is just used as temporary storage before it writes it
- * through to the disk.
+ * You can supply a WritableStreamDefaultWriter from FileSystemWritableFileStream 
+ * (https://wicg.github.io/file-system-access/#api-filesystemwritablefilestream)  
+ * in which case the BlobBuffer is just used as temporary storage before it writes it through to the disk.
  *
  * By Nicholas Sherlock
  *
@@ -20,7 +21,9 @@
 				fileWriter = null,
 				fd = null;
 			
-			if (destination && destination.constructor.name === "FileWriter") {
+			if (destination &&
+                          typeof FileSystemFileHandle !== 'undefined' &&
+                          destination instanceof WritableStreamDefaultWriter) {
 				fileWriter = destination;
 			} else if (fs && destination) {
 				fd = destination;
@@ -140,11 +143,20 @@
 							});
 						});
 					} else if (fileWriter) {
-						return new Promise(function (resolve, reject) {
-							fileWriter.onwriteend = resolve;
-							
-							fileWriter.seek(newEntry.offset);
-							fileWriter.write(new Blob([newEntry.data]));
+						return new Promise(async function (resolve, reject) {
+					         	try {
+								if (newEntry.offset === 0) {
+							    		await fileWriter.ready;
+								}
+								await fileWriter.write({
+                						        type: 'write',
+                							position: newEntry.offset,
+                							data: new Blob([newEntry.data]),
+              							      });
+								resolve();
+							} catch (err) {
+							    	reject(err);
+							}
 						});
 					} else if (!isAppend) {
 						// We might be modifying a write that was already buffered in memory.
@@ -190,10 +202,10 @@
 			/**
 			 * Finish all writes to the buffer, returning a promise that signals when that is complete.
 			 *
-			 * If a FileWriter was not provided, the promise is resolved with a Blob that represents the completed BlobBuffer
+			 * If a WritableStreamDefaultWriter was not provided, the promise is resolved with a Blob that represents the completed BlobBuffer
 			 * contents. You can optionally pass in a mimeType to be used for this blob.
 			 *
-			 * If a FileWriter was provided, the promise is resolved with null as the first argument.
+			 * If a WritableStreamDefaultWriter was provided, the promise is resolved with null as the first argument.
 			 */
 			this.complete = function (mimeType) {
 				if (fd || fileWriter) {
