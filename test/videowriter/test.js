@@ -1,7 +1,7 @@
 function pickFile() {
     return new Promise(function(resolve, reject) {
         chrome.fileSystem.chooseEntry({type: 'saveFile', suggestedName: "video.webm", accepts: [{extensions: ['webm']}]}, function(fileEntry) {
-            var 
+            let
                 error = chrome.runtime.lastError;
             
             if (error) {
@@ -32,14 +32,15 @@ function openFileForWrite(fileEntry) {
 }
 
 function renderToDevice(fileEntry, fileWriter) {
-    var 
+    let
         videoWriter = new WebMWriter({
-            frameRate: 30, 
+            frameRate: 30,
             fileWriter: fileWriter
         }),
         
         canvas = document.getElementById("canvas"),
         context = canvas.getContext("2d"),
+        video = document.getElementsByTagName("video")[0],
         
         helloWorld = "Hello World",
         
@@ -55,7 +56,7 @@ function renderToDevice(fileEntry, fileWriter) {
     context.font = textHeight + "pt Arial";
     textWidth = context.measureText(helloWorld).width;
     
-    var renderFrame = function(frameIndex) {
+    let renderFrame = function(frameIndex) {
         context.fillStyle = "#eee";
         context.fillRect(0, 0, canvas.width, canvas.height);
         
@@ -78,18 +79,18 @@ function renderToDevice(fileEntry, fileWriter) {
             if (frameIndex == maxFrames) {
                 if (fileWriter == null) {
                     videoWriter.complete().then(function(webMBlob) {
-                        $("video").attr('src', URL.createObjectURL(webMBlob));
+                        video.src = URL.createObjectURL(webMBlob);
                         
                         saveAs(webMBlob, 'video.webm');
                     });
                 } else {
                     videoWriter.complete().then(function() {
                         fileEntry.file(function(file) {
-                            var
+                            let
                                 fileReader = new FileReader();
                             
                             fileReader.onloadend = function() {
-                                $("video").attr('src', fileReader.result);
+                                video.src = fileReader.result;
                             }
                             
                             fileReader.readAsDataURL(file);
@@ -105,7 +106,7 @@ function renderToDevice(fileEntry, fileWriter) {
     renderFrame(0);
 }
 
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
     if (chrome.fileSystem) {
         pickFile().then(function(fileEntry) {
             openFileForWrite(fileEntry).then(function(fileWriter) {
@@ -115,4 +116,4 @@ $(document).ready(function() {
     } else {
         renderToDevice(null);
     }
-});
+}, false);

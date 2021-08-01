@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Video writer test</title>
-    <script type="text/javascript" src="jquery.min.js"></script>
     <script type="text/javascript" src="webm-writer.js"></script>
     <script type="text/javascript" src="FileSaver.js"></script>
     <script type="text/javascript" src="test.js"></script>
@@ -15,13 +14,13 @@
     </style>
 </head>
 <body>
-    <!-- 
-    
+    <!--
+
     This test may either be installed in Google Chrome using Chrome's extension menu's "add unpacked extension" option,
     whereupon it can use Chrome's FileWriter API to stream the video to disk directly, or this file can instead
     be viewed as a normal webpage, in which case it will buffer the video in memory and use the FileSaver tool to save
     it to disk after buffering is complete.
-    
+
      -->
     <div class="video-block">
         <h2>Rendering canvas animation...</h2>
@@ -29,7 +28,7 @@
     </div>
     <div class="video-block">
         <h2>Rendered WebM video</h2>
-        <video controls loop autoplay width="500" height="500"></video>
+        <video controls loop muted autoplay width="500" height="500"></video>
     </div>
 </body>
 </html>

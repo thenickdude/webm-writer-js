@@ -1,8 +1,8 @@
 /**
  * A tool for presenting an ArrayBuffer as a stream for writing some simple data types.
- * 
+ *
  * By Nicholas Sherlock
- * 
+ *
  * Released under the WTFPLv2 https://en.wikipedia.org/wiki/WTFPL
  */
 
@@ -13,17 +13,17 @@
      * Create an ArrayBuffer of the given length and present it as a writable stream with methods
      * for writing data in different formats.
      */
-    var ArrayBufferDataStream = function(length) {
+    let ArrayBufferDataStream = function(length) {
         this.data = new Uint8Array(length);
         this.pos = 0;
     };
     
-    ArrayBufferDataStream.prototype.seek = function(offset) {
-        this.pos = offset;
+    ArrayBufferDataStream.prototype.seek = function(toOffset) {
+        this.pos = toOffset;
     };
 
     ArrayBufferDataStream.prototype.writeBytes = function(arr) {
-        for (var i = 0; i < arr.length; i++) {
+        for (let i = 0; i < arr.length; i++) {
             this.data[this.pos++] = arr[i];
         }
     };
@@ -41,19 +41,19 @@
     };
 
     ArrayBufferDataStream.prototype.writeDoubleBE = function(d) {
-        var 
+        let
             bytes = new Uint8Array(new Float64Array([d]).buffer);
         
-        for (var i = bytes.length - 1; i >= 0; i--) {
+        for (let i = bytes.length - 1; i >= 0; i--) {
             this.writeByte(bytes[i]);
         }
     };
 
     ArrayBufferDataStream.prototype.writeFloatBE = function(d) {
-        var 
+        let
             bytes = new Uint8Array(new Float32Array([d]).buffer);
         
-        for (var i = bytes.length - 1; i >= 0; i--) {
+        for (let i = bytes.length - 1; i >= 0; i--) {
             this.writeByte(bytes[i]);
         }
     };
@@ -62,17 +62,17 @@
      * Write an ASCII string to the stream
      */
     ArrayBufferDataStream.prototype.writeString = function(s) {
-        for (var i = 0; i < s.length; i++) {
+        for (let i = 0; i < s.length; i++) {
             this.data[this.pos++] = s.charCodeAt(i);
         }
     };
 
     /**
-     * Write the given 32-bit integer to the stream as an EBML variable-length integer using the given byte width 
+     * Write the given 32-bit integer to the stream as an EBML variable-length integer using the given byte width
      * (use measureEBMLVarInt).
-     * 
+     *
      * No error checking is performed to ensure that the supplied width is correct for the integer.
-     * 
+     *
      * @param i Integer to be written
      * @param width Number of bytes to write to the stream
      */
@@ -97,18 +97,18 @@
                 this.writeU8(i);
             break;
             case 5:
-                /* 
-                 * JavaScript converts its doubles to 32-bit integers for bitwise operations, so we need to do a 
+                /*
+                 * JavaScript converts its doubles to 32-bit integers for bitwise operations, so we need to do a
                  * division by 2^32 instead of a right-shift of 32 to retain those top 3 bits
                  */
-                this.writeU8((1 << 3) | ((i / 4294967296) & 0x7)); 
+                this.writeU8((1 << 3) | ((i / 4294967296) & 0x7));
                 this.writeU8(i >> 24);
                 this.writeU8(i >> 16);
                 this.writeU8(i >> 8);
                 this.writeU8(i);
             break;
             default:
-                throw new RuntimeException("Bad EBML VINT size " + width);
+                throw new Error("Bad EBML VINT size " + width);
         }
     };
     
@@ -116,7 +116,7 @@
      * Return the number of bytes needed to encode the given integer as an EBML VINT.
      */
     ArrayBufferDataStream.prototype.measureEBMLVarInt = function(val) {
-        if (val < (1 << 7) - 1) { 
+        if (val < (1 << 7) - 1) {
             /* Top bit is set, leaving 7 bits to hold the integer, but we can't store 127 because
              * "all bits set to one" is a reserved value. Same thing for the other cases below:
              */
@@ -130,7 +130,7 @@
         } else if (val < 34359738367) { // 2 ^ 35 - 1 (can address 32GB)
             return 5;
         } else {
-            throw new RuntimeException("EBML VINT size not supported " + val);
+            throw new Error("EBML VINT size not supported " + val);
         }
     };
     
@@ -141,9 +141,9 @@
     /**
      * Write the given unsigned 32-bit integer to the stream in big-endian order using the given byte width.
      * No error checking is performed to ensure that the supplied width is correct for the integer.
-     * 
+     *
      * Omit the width parameter to have it determined automatically for you.
-     * 
+     *
      * @param u Unsigned integer to be written
      * @param width Number of bytes to write to the stream
      */
@@ -166,7 +166,7 @@
                 this.writeU8(u);
             break;
             default:
-                throw new RuntimeException("Bad UINT size " + width);
+                throw new Error("Bad UINT size " + width);
         }
     };
     
@@ -197,7 +197,7 @@
         } else if (this.pos == this.data.byteLength) {
             return this.data;
         } else {
-            throw "ArrayBufferDataStream's pos lies beyond end of buffer";
+            throw new Error("ArrayBufferDataStream's pos lies beyond end of buffer");
         }
     };
 	

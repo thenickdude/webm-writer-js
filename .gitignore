@@ -1,2 +1,3 @@
-test/videowriter/webm-writer.js
-/test/electron/node_modules/
+node_modules/
+/dist/
+/test/videowriter/webm-writer.js

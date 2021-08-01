@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Video writer test</title>
+    <script type="text/javascript" src="../../dist/webm-writer.js"></script>
+    <script type="text/javascript" src="test.js"></script>
+    <style type="text/css">
+        .video-block {
+            display:inline-block;
+            margin-right:1em;
+            vertical-align: top;
+        }
+        video {
+            background-repeat:repeat;
+            background-image:url(checkerboard.png);
+            padding:16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="video-line">
+        <div class="video-block">
+            <h2>Rendering canvas animation...</h2>
+            <canvas id="canvas1" width="512" height="512"></canvas>
+        </div>
+        <div class="video-block">
+            <h2>Rendered WebM video</h2>
+            <video id="video1" controls loop autoplay muted width="512" height="512"></video>
+        </div>
+    </div>
+    <div>
+        <div class="video-block">
+                <h2>Animation image:</h2>
+                <canvas id="canvas2" width="512" height="512"></canvas>
+        </div>
+        <div class="video-block">
+            <h2>Animation mask:</h2>
+            <canvas id="mask" width="512" height="512"></canvas>
+        </div>
+        <div class="video-block">
+            <h2>Rendered WebM video</h2>
+            <video id="video2" controls loop autoplay muted width="512" height="512"></video>
+        </div>
+    </div>
+</body>
+</html>

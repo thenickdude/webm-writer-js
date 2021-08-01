@@ -3,24 +3,24 @@
 /**
  * Allows a series of Blob-convertible objects (ArrayBuffer, Blob, String, etc) to be added to a buffer. Seeking and
  * overwriting of blobs is allowed.
- * 
- * You can supply a FileWriter, in which case the BlobBuffer is just used as temporary storage before it writes it 
+ *
+ * You can supply a FileWriter, in which case the BlobBuffer is just used as temporary storage before it writes it
  * through to the disk.
- * 
+ *
  * By Nicholas Sherlock
- * 
+ *
  * Released under the WTFPLv2 https://en.wikipedia.org/wiki/WTFPL
  */
 (function() {
-	var BlobBuffer = function(fs) {
+	let BlobBuffer = function(fs) {
 		return function(destination) {
-			var
+			let
 				buffer = [],
 				writePromise = Promise.resolve(),
 				fileWriter = null,
 				fd = null;
 			
-			if (typeof FileWriter !== "undefined" && destination instanceof FileWriter) {
+			if (destination && destination.constructor.name === "FileWriter") {
 				fileWriter = destination;
 			} else if (fs && destination) {
 				fd = destination;
@@ -35,7 +35,7 @@
 			// Returns a promise that converts the blob to an ArrayBuffer
 			function readBlobAsBuffer(blob) {
 				return new Promise(function (resolve, reject) {
-					var
+					let
 						reader = new FileReader();
 					
 					reader.addEventListener("loadend", function () {
@@ -66,11 +66,11 @@
 			}
 			
 			function measureData(data) {
-				var
+				let
 					result = data.byteLength || data.length || data.size;
 				
 				if (!Number.isInteger(result)) {
-					throw "Failed to determine size of element";
+					throw new Error("Failed to determine size of element");
 				}
 				
 				return result;
@@ -84,15 +84,15 @@
 			 */
 			this.seek = function (offset) {
 				if (offset < 0) {
-					throw "Offset may not be negative";
+					throw new Error("Offset may not be negative");
 				}
 				
 				if (isNaN(offset)) {
-					throw "Offset may not be NaN";
+					throw new Error("Offset may not be NaN");
 				}
 				
 				if (offset > this.length) {
-					throw "Seeking beyond the end of file is not allowed";
+					throw new Error("Seeking beyond the end of file is not allowed");
 				}
 				
 				this.pos = offset;
@@ -105,7 +105,7 @@
 			 * be fully contained by the extent of a previous write).
 			 */
 			this.write = function (data) {
-				var
+				let
 					newEntry = {
 						offset: this.pos,
 						data: data,
@@ -121,7 +121,7 @@
 					if (fd) {
 						return new Promise(function(resolve, reject) {
 							convertToUint8Array(newEntry.data).then(function(dataArray) {
-								var
+								let
 									totalWritten = 0,
 									buffer = Buffer.from(dataArray.buffer),
 									
@@ -150,8 +150,8 @@
 						// We might be modifying a write that was already buffered in memory.
 						
 						// Slow linear search to find a block we might be overwriting
-						for (var i = 0; i < buffer.length; i++) {
-							var
+						for (let i = 0; i < buffer.length; i++) {
+							let
 								entry = buffer[i];
 							
 							// If our new entry overlaps the old one in any way...
@@ -203,10 +203,10 @@
 				} else {
 					// After writes complete we need to merge the buffer to give to the caller
 					writePromise = writePromise.then(function () {
-						var
+						let
 							result = [];
 						
-						for (var i = 0; i < buffer.length; i++) {
+						for (let i = 0; i < buffer.length; i++) {
 							result.push(buffer[i].data);
 						}
 						
