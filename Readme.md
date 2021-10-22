@@ -3,18 +3,17 @@
 This is a JavaScript-based WebM video encoder based on the ideas from [Whammy][]. It allows you to turn a series of 
 Canvas frames into a WebM video.
 
-This implementation allows you to create very large video files (exceeding the size of available memory), because when
-running in a privileged context like a Chrome extension or Electron app, it can stream chunks immediately to a file on disk 
-using [Chrome's FileWriter][] while the video is being constructed, instead of needing to buffer the entire video in
-memory before saving can begin. Video sizes in excess of 4GB can be written. The implementation currently tops out at 
+This implementation allows you to create very large video files (exceeding the size of available memory), because it can stream chunks immediately to a file on disk using [`WritableStreamDefaultWriter`][] of [File System Access][] [`FileSystemWritableFileStream`][] while the video is being constructed, instead of needing to buffer the entire video in memory before saving can begin. Video sizes in excess of 4GB can be written. The implementation currently tops out at 
 32GB, but this could be extended.
 
-When a FileWriter is not available, it can instead buffer the video in memory as a series of Blobs which are eventually 
+When a `WritableStreamDefaultWriter` is not available, it can instead buffer the video in memory as a series of Blobs which are eventually 
 returned to the calling code as one composite Blob. This Blob can be displayed in a &lt;video&gt; element, transmitted 
 to a server, or used for some other purpose. Note that some browsers size limits on Blobs, particularly mobile 
 browsers, check out the [Blob size limits][].
 
-[Chrome's FileWriter]: https://developer.chrome.com/apps/fileSystem
+[`WritableStreamDefaultWriter`]: https://streams.spec.whatwg.org/#writablestreamdefaultwriter
+[`FileSystemWritableFileStream`]: https://wicg.github.io/file-system-access/#api-filesystemwritablefilestream
+[File System Access]: https://wicg.github.io/file-system-access/
 [Whammy]: https://github.com/antimatter15/whammy
 [Blob size limits]: https://github.com/eligrey/FileSaver.js/
 
@@ -91,6 +90,43 @@ videoWriter.complete().then(function(webMBlob) {
 
 The video encoder can use Node.js file APIs to write the video to disk when running under Electron. There is an example
 in `test/electron`. Run `npm install` in that directory to fetch required libraries, then `npm start` to launch Electron.
+
+## Usage (File System Access)
+
+```js
+document.querySelector('p').onclick = async () => {
+  const fileHandle = await showSaveFilePicker({
+    suggestedName: 'webm-writer-filesystem-access.webm',
+    startIn: 'videos',
+    id: 'webm-writer',
+    types: [
+      {
+        description: 'WebM files',
+        accept: {
+          'video/webm': ['.webm'],
+        },
+      },
+    ],
+    excludeAcceptAllOption: true,
+  });
+  const writable = await fileHandle.createWritable();
+  const fileWriter = await writable.getWriter();
+  const videoWriter = new WebMWriter({
+    quality: 0.95, // WebM image quality from 0.0 (worst) to 1.0 (best)
+    fileWriter, // WritableStreamDefaultWriter in order to stream to a file instead of buffering to memory (optional)
+    fd: null, // Node.js file handle to write to instead of buffering to memory (optional)
+    // You must supply one of:
+    frameDuration: null, // Duration of frames in milliseconds
+    frameRate: 30, // Number of frames per second
+  });
+  // ...
+  videoWriter.addFrame(frame[i], frameDuration);
+  // ...
+  await videoWriter.complete();
+  await fileWriter.close();
+  await fileWriter.closed;
+};
+```
 
 ## Transparent WebM support
 
