@@ -775,7 +775,12 @@
                         throw new Error("Missing required frameDuration or frameRate setting");
                     }
                 }
-                
+
+                // frameDuration value has to be a number, otherwise there is unusual behavior without an error message
+                if (options.frameDuration && typeof options.frameDuration !== "number") {
+                        throw new Error("frameDuration value has to be a number. But it's a " + typeof options.frameDuration);
+                }
+
                 // Avoid 1.0 (lossless) because it creates VP8L lossless frames that WebM doesn't support
                 options.quality = Math.max(Math.min(options.quality, 0.99999), 0);
                 
