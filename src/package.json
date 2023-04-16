@@ -19,7 +19,7 @@
   "homepage": "https://github.com/thenickdude/webm-writer-js#readme",
   "devDependencies": {
     "electron": "^15.2.0",
-    "electron-mocha": "^10.1.0",
+    "electron-mocha": "^11.0.2",
     "mocha": "^9.1.3"
   }
 }
